@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Accountability Partners 💪</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0c0c14;
+      --surface:  #13131f;
+      --surface2: #1a1a2e;
+      --border:   #252538;
+      --text:     #e2e2ec;
+      --muted:    #6b6b8a;
+      --radius:   12px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      padding: 24px 16px 60px;
+    }
+
+    .container { max-width: 980px; margin: 0 auto; }
+
+    /* ── Header ── */
+    .header { margin-bottom: 28px; }
+    .header-top { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+    .header h1 { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.02em; }
+    .updated-badge {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.72rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+    .updated-badge.fresh { border-color: #43E97B44; color: #43E97B; }
+    .header-sub { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
+
+    /* ── Section headings ── */
+    .section { margin-bottom: 36px; }
+    .section-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    /* ── Hero cards ── */
+    .hero { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+    .hero-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 16px;
+    }
+    .hero-val {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #6C63FF, #FA709A);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-lbl { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── Spotlight ── */
+    .spotlight {
+      background: linear-gradient(135deg, #13131f, #1a1a2e);
+      border: 1px solid #6C63FF44;
+      border-radius: var(--radius);
+      padding: 18px 20px;
+    }
+    .spotlight-title { font-size: 0.8rem; font-weight: 700; color: #9B97FF; margin-bottom: 10px; }
+    .spotlight-items { display: flex; flex-wrap: wrap; gap: 8px; }
+    .spotlight-pill {
+      background: var(--surface2);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 0.82rem;
+      border: 1px solid var(--border);
+    }
+    .spotlight-pill.milestone { border-color: #FFB34766; color: #FFB347; background: #FFB34712; }
+    .spotlight-pill.most-active { border-color: #43E97B66; color: #43E97B; background: #43E97B12; }
+    .spotlight-pill.comeback { border-color: #4FC3F766; color: #4FC3F7; background: #4FC3F712; }
+
+    /* ── Leaderboard ── */
+    .table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left; padding: 10px 14px;
+      font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em;
+      color: var(--muted); background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    th.num, td.num { text-align: right; }
+    td {
+      padding: 11px 14px;
+      border-bottom: 1px solid #17172a;
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #17172a; }
+    .rank { font-size: 1.1rem; width: 42px; }
+    .person-name { font-weight: 600; font-size: 0.9rem; }
+    .person-dot {
+      display: inline-block; width: 8px; height: 8px;
+      border-radius: 50%; margin-right: 6px; flex-shrink: 0;
+    }
+    .person-cell { display: flex; align-items: center; gap: 4px; }
+    .streak-val { font-weight: 700; }
+    .streak-active { color: #FF9F43; }
+    .streak-dead { color: var(--muted); }
+    .tag {
+      display: inline-block; padding: 2px 9px;
+      border-radius: 20px; font-size: 0.72rem; font-weight: 500; white-space: nowrap;
+    }
+    .tag-today  { background: #1a3d2e; color: #43E97B; }
+    .tag-yday   { background: #1a2a40; color: #4FC3F7; }
+    .tag-recent { background: #3d2e00; color: #FFB347; }
+    .tag-stale  { background: #222; color: var(--muted); }
+    .badges { display: flex; gap: 3px; flex-wrap: wrap; }
+    .badge {
+      font-size: 0.62rem; padding: 1px 5px; border-radius: 4px;
+      background: var(--surface2); color: var(--muted); border: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .badge.gold   { background: #FFB34720; color: #FFB347; border-color: #FFB34755; }
+    .badge.purple { background: #6C63FF20; color: #9B97FF; border-color: #6C63FF55; }
+    .badge.fire   { background: #FF6B6B20; color: #FF9F43; border-color: #FF9F4355; }
+    .badge.green  { background: #43E97B20; color: #43E97B; border-color: #43E97B55; }
+
+    /* ── Missing in Action ── */
+    .mia-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+    .mia-card {
+      background: var(--surface);
+      border: 1px solid #FF6B6B44;
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .mia-emoji { font-size: 1.6rem; }
+    .mia-name { font-weight: 600; font-size: 0.9rem; }
+    .mia-days { font-size: 0.78rem; color: #FF9F43; margin-top: 1px; }
+
+    /* ── Chart wrappers ── */
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    /* ── Heatmap ── */
+    .heatmap-section { }
+    .heatmap-row {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 6px;
+    }
+    .heatmap-label {
+      width: 64px; flex-shrink: 0;
+      font-size: 0.78rem; font-weight: 600; color: var(--text);
+      text-align: right;
+    }
+    .heatmap-label-emoji { font-size: 1rem; margin-right: 3px; }
+    .heatmap-grid {
+      display: grid;
+      grid-template-rows: repeat(7, 10px);
+      grid-auto-flow: column;
+      grid-auto-columns: 10px;
+      gap: 2px;
+    }
+    .hm-cell { width: 10px; height: 10px; border-radius: 2px; }
+    .hm-empty { background: transparent !important; }
+    .hm-day-labels {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 4px;
+    }
+    .hm-spacer { width: 64px; flex-shrink: 0; }
+    .hm-week-labels {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: 10px;
+      gap: 2px;
+      overflow: hidden;
+    }
+    .hm-month-label {
+      font-size: 0.65rem; color: var(--muted);
+      grid-column: span 4; /* approx 4 weeks per month */
+    }
+    .heatmap-legend {
+      display: flex; align-items: center; gap: 6px;
+      margin-top: 10px; font-size: 0.72rem; color: var(--muted);
+      justify-content: flex-end;
+    }
+
+    /* ── Stat Cards ── */
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--accent, #6C63FF);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+    .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .card-emoji { font-size: 1.6rem; }
+    .card-name { font-weight: 700; }
+    .card-streak { font-size: 0.75rem; color: var(--muted); margin-top: 1px; }
+    .card-total { font-size: 1.9rem; font-weight: 800; margin-left: auto; }
+    .card-mini { display: flex; border-top: 1px solid var(--border); margin-top: 4px; }
+    .mini-stat { flex: 1; text-align: center; padding: 8px 0; border-right: 1px solid var(--border); }
+    .mini-stat:last-child { border-right: none; }
+    .mini-val { display: block; font-size: 1.15rem; font-weight: 700; }
+    .mini-lbl { display: block; font-size: 0.67rem; color: var(--muted); margin-top: 1px; }
+    .card-badges { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+
+    footer { text-align: center; color: var(--muted); font-size: 0.72rem; margin-top: 40px; }
+
+    @media (max-width: 600px) {
+      .hero { grid-template-columns: 1fr 1fr; }
+      body { padding: 16px 12px 40px; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-top">
+      <h1>💪 Accountability Partners</h1>
+      <span class="updated-badge" id="updated-badge">Loading…</span>
+    </div>
+    <p class="header-sub" id="header-sub">2026 workout tracking</p>
+  </header>
+
+  <!-- HERO STATS -->
+  <div class="section">
+    <div class="hero" id="hero-cards"></div>
+  </div>
+
+  <!-- SPOTLIGHT -->
+  <div class="section" id="spotlight-section" style="display:none">
+    <div class="section-title">🔦 This Week's Highlights</div>
+    <div class="spotlight">
+      <div class="spotlight-title">Week <span id="week-num"></span></div>
+      <div class="spotlight-items" id="spotlight-items"></div>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div class="section">
+    <div class="section-title">🏆 Leaderboard</div>
+    <div class="table-wrap">
+      <table id="leaderboard-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Member</th>
+            <th class="num">Total</th>
+            <th class="num">This&nbsp;Week</th>
+            <th class="num">Last&nbsp;30d</th>
+            <th class="num">Streak</th>
+            <th class="num">Best</th>
+            <th>Last Active</th>
+            <th>Achievements</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MISSING IN ACTION -->
+  <div class="section" id="mia-section" style="display:none">
+    <div class="section-title">👀 Missing in Action</div>
+    <div class="mia-grid" id="mia-grid"></div>
+  </div>
+
+  <!-- RACE CHART -->
+  <div class="section">
+    <div class="section-title">📈 Workout Race — 2026</div>
+    <div class="chart-card">
+      <canvas id="race-chart" height="90"></canvas>
+    </div>
+  </div>
+
+  <!-- ACTIVITY HEATMAP -->
+  <div class="section">
+    <div class="section-title">🗓 Activity Calendar — Jan → Today</div>
+    <div class="chart-card">
+      <div id="heatmap-container"></div>
+      <div class="heatmap-legend">
+        <span>Less</span>
+        <div style="width:10px;height:10px;border-radius:2px;background:#1e1e30"></div>
+        <div style="width:10px;height:10px;border-radius:2px;background:#888;opacity:.6"></div>
+        <div style="width:10px;height:10px;border-radius:2px;background:#43E97B"></div>
+        <span>More</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MONTHLY BAR CHART -->
+  <div class="section">
+    <div class="section-title">📅 Monthly Activity</div>
+    <div class="chart-card">
+      <canvas id="monthly-chart" height="85"></canvas>
+    </div>
+  </div>
+
+  <!-- INDIVIDUAL CARDS -->
+  <div class="section">
+    <div class="section-title">🎯 Individual Stats</div>
+    <div class="cards-grid" id="stat-cards"></div>
+  </div>
+
+  <footer id="footer">Built from WhatsApp chat history</footer>
+</div>
+
+<script>
+/* ── Helpers ── */
+const MEDALS = ['🥇','🥈','🥉'];
+
+const BADGE_META = {
+  w25:  { label: '🎯 25',  cls: 'gold'   },
+  w50:  { label: '🏅 50',  cls: 'gold'   },
+  w75:  { label: '⭐ 75',  cls: 'gold'   },
+  w100: { label: '💯',     cls: 'gold'   },
+  w125: { label: '🌟 125', cls: 'gold'   },
+  s7:   { label: '🔥 7d',  cls: 'fire'   },
+  s14:  { label: '🔥 14d', cls: 'fire'   },
+  s30:  { label: '🔥 30d', cls: 'fire'   },
+  consistent_month: { label: '📅 20+', cls: 'purple' },
+};
+
+function timeAgo(isoStr) {
+  const then = new Date(isoStr);
+  const diff = Math.floor((Date.now() - then) / 60000); // minutes
+  if (diff < 60)   return `${diff}m ago`;
+  if (diff < 1440) return `${Math.floor(diff/60)}h ago`;
+  return `${Math.floor(diff/1440)}d ago`;
+}
+
+function lastActiveTag(daysSince) {
+  if (daysSince === 0) return '<span class="tag tag-today">Today</span>';
+  if (daysSince === 1) return '<span class="tag tag-yday">Yesterday</span>';
+  if (daysSince <= 5) return `<span class="tag tag-recent">${daysSince}d ago</span>`;
+  return `<span class="tag tag-stale">${daysSince}d ago</span>`;
+}
+
+function weekNumber(d) {
+  const date = new Date(d);
+  date.setHours(0,0,0,0);
+  date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+  const w1 = new Date(date.getFullYear(), 0, 4);
+  return 1 + Math.round(((date - w1) / 86400000 - 3 + (w1.getDay() + 6) % 7) / 7);
+}
+
+/* ── Main render ── */
+Chart.defaults.color = '#6b6b8a';
+Chart.defaults.borderColor = '#252538';
+
+function render(data) {
+  const people = data.people;
+  const ranked = Object.entries(people).sort((a,b) => b[1].total - a[1].total);
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  renderHeader(data);
+  renderHero(ranked);
+  renderSpotlight(data, ranked);
+  renderLeaderboard(ranked);
+  renderMIA(data.mia, people);
+  renderRaceChart(ranked);
+  renderHeatmaps(ranked);
+  renderMonthlyChart(ranked, data.date_range);
+  renderStatCards(ranked);
+  document.getElementById('footer').textContent =
+    `Built from WhatsApp chat history · ${data.date_range.start} → ${data.date_range.end}`;
+}
+
+function renderHeader(data) {
+  const ago = timeAgo(data.generated_at);
+  const badge = document.getElementById('updated-badge');
+  badge.textContent = `Updated ${ago}`;
+  if (ago.endsWith('ago') && parseInt(ago) < 48) badge.classList.add('fresh');
+  document.getElementById('week-num').textContent = weekNumber(new Date());
+  document.getElementById('header-sub').textContent =
+    `2026 workout tracking · ${data.date_range.start} → ${data.date_range.end}`;
+}
+
+function renderHero(ranked) {
+  const total = ranked.reduce((s,[,p]) => s + p.total, 0);
+  const thisWeek = ranked.reduce((s,[,p]) => s + p.weekly, 0);
+  const topStreak = ranked.reduce((a,[n,p]) => p.current_streak > a.v ? {n,v:p.current_streak} : a, {n:'',v:0});
+  const todayCount = ranked.filter(([,p]) => p.days_since === 0).length;
+
+  const cards = [
+    { val: total,          lbl: 'Total sessions (2026)' },
+    { val: thisWeek,       lbl: 'Sessions this week' },
+    { val: todayCount,     lbl: 'Worked out today' },
+    { val: topStreak.v ? `${topStreak.v}d` : '—',
+      lbl: `Longest streak${topStreak.n ? ` (${topStreak.n})` : ''}` },
+  ];
+
+  document.getElementById('hero-cards').innerHTML = cards.map(c =>
+    `<div class="hero-card">
+       <div class="hero-val">${c.val}</div>
+       <div class="hero-lbl">${c.lbl}</div>
+     </div>`
+  ).join('');
+}
+
+function renderSpotlight(data, ranked) {
+  const sp = data.spotlight;
+  if (!sp) return;
+  const items = [];
+  const people = data.people;
+
+  if (sp.most_active_week) {
+    const {name, count} = sp.most_active_week;
+    const p = people[name] || {};
+    items.push(`<span class="spotlight-pill most-active">${p.emoji||''} ${name}: ${count} sessions this week 💪</span>`);
+  }
+  (sp.milestones||[]).forEach(m => {
+    const p = people[m.name] || {};
+    items.push(`<span class="spotlight-pill milestone">${p.emoji||''} ${m.name} just crossed #${m.number}! 🎉</span>`);
+  });
+  (sp.comebacks||[]).forEach(name => {
+    const p = people[name] || {};
+    items.push(`<span class="spotlight-pill comeback">${p.emoji||''} ${name} is back! 🙌</span>`);
+  });
+
+  if (items.length === 0) return;
+  document.getElementById('spotlight-section').style.display = '';
+  document.getElementById('spotlight-items').innerHTML = items.join('');
+}
+
+function renderLeaderboard(ranked) {
+  const tbody = document.getElementById('leaderboard-body');
+  tbody.innerHTML = ranked.map(([name, p], i) => {
+    const badge = i < 3 ? MEDALS[i] : `#${i+1}`;
+    const streakCls = p.current_streak > 0 ? 'streak-active' : 'streak-dead';
+    const streakIcon = p.current_streak >= 3 ? '🔥' : (p.current_streak > 0 ? '⚡' : '');
+    const streakStr = `<span class="streak-val ${streakCls}">${streakIcon}${p.current_streak}</span>`;
+    const weeklyStyle = p.weekly >= 4 ? 'color:#43E97B;font-weight:700' : (p.weekly === 0 ? 'color:#444' : '');
+    const badges = (p.achievements||[]).slice(0,4).map(b => {
+      const m = BADGE_META[b] || {label: b, cls: ''};
+      return `<span class="badge ${m.cls}">${m.label}</span>`;
+    }).join('');
+
+    return `<tr>
+      <td class="rank">${badge}</td>
+      <td>
+        <div class="person-cell">
+          <span class="person-dot" style="background:${p.color}"></span>
+          <span class="person-name">${p.emoji} ${name}</span>
+        </div>
+      </td>
+      <td class="num" style="font-weight:700">${p.total}</td>
+      <td class="num" style="${weeklyStyle}">${p.weekly}</td>
+      <td class="num">${p.last30}</td>
+      <td class="num">${streakStr}</td>
+      <td class="num" style="color:var(--muted)">${p.best_streak}</td>
+      <td>${lastActiveTag(p.days_since)}</td>
+      <td><div class="badges">${badges}</div></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderMIA(mia, people) {
+  const serious = (mia||[]).filter(m => m.days_since > 7);
+  if (!serious.length) return;
+  document.getElementById('mia-section').style.display = '';
+  const MIA_QUIPS = [
+    d => d > 60 ? '🐻 Hibernating' : d > 30 ? '👻 Ghost mode' : d > 14 ? '🥱 Taking a breather' : '😴 Resting',
+  ];
+  document.getElementById('mia-grid').innerHTML = serious.map(m => {
+    const p = people[m.name] || {};
+    const quip = m.days_since > 60 ? '🐻 Hibernating' : m.days_since > 30 ? '👻 Ghost mode' : m.days_since > 14 ? '🥱 Long break' : '😴 Rest day';
+    return `<div class="mia-card">
+      <div class="mia-emoji">${p.emoji||'❓'}</div>
+      <div>
+        <div class="mia-name">${m.name}</div>
+        <div class="mia-days">${m.days_since}d MIA &nbsp;·&nbsp; ${quip}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderRaceChart(ranked) {
+  // Only include people with meaningful timeseries
+  const datasets = ranked
+    .filter(([,p]) => p.timeseries && p.timeseries.length > 2)
+    .map(([name, p]) => ({
+      label: `${p.emoji} ${name}`,
+      data: p.timeseries.map(pt => ({ x: pt.date, y: pt.count })),
+      borderColor: p.color,
+      backgroundColor: p.color + '18',
+      borderWidth: 2,
+      tension: 0,
+      spanGaps: true,
+      pointRadius: 0,
+      pointHoverRadius: 4,
+      fill: false,
+    }));
+
+  new Chart(document.getElementById('race-chart'), {
+    type: 'line',
+    data: { datasets },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: '#aaa', padding: 14, boxWidth: 12 } },
+        tooltip: {
+          callbacks: {
+            title: items => {
+              const d = new Date(items[0].parsed.x);
+              return d.toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'});
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          type: 'time',
+          time: { unit: 'month', displayFormats: { month: 'MMM' } },
+          grid: { color: '#1f1f30' },
+          ticks: { color: '#6b6b8a', maxTicksLimit: 7 },
+        },
+        y: {
+          beginAtZero: true,
+          grid: { color: '#1f1f30' },
+          ticks: { color: '#6b6b8a' },
+          title: { display: true, text: 'Cumulative sessions', color: '#6b6b8a', font: { size: 11 } },
+        },
+      },
+    },
+  });
+}
+
+function renderHeatmaps(ranked) {
+  const container = document.getElementById('heatmap-container');
+  const startDate = new Date('2026-01-01');
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  // Day offset: Jan 1 is Thursday → Mon=0, Thu=3
+  const dayOffset = (startDate.getDay() + 6) % 7; // 3
+
+  // Month label row
+  const monthRow = document.createElement('div');
+  monthRow.className = 'hm-day-labels';
+  monthRow.innerHTML = '<div class="hm-spacer"></div>';
+  const weekLabelGrid = document.createElement('div');
+  weekLabelGrid.className = 'hm-week-labels';
+
+  // Calculate total weeks
+  const totalDays = Math.floor((today - startDate) / 86400000) + 1;
+  const totalCells = dayOffset + totalDays;
+  const totalWeeks = Math.ceil(totalCells / 7);
+
+  // Month labels
+  let labelAdded = {};
+  let cellIdx = dayOffset; // first Jan 1
+  for (let w = 0; w < totalWeeks; w++) {
+    const mondayOffset = w * 7 - dayOffset;
+    const colDate = new Date(startDate);
+    colDate.setDate(colDate.getDate() + mondayOffset);
+    const monthKey = `${colDate.getFullYear()}-${colDate.getMonth()}`;
+    const span = document.createElement('div');
+    span.style.cssText = 'font-size:0.65rem;color:#6b6b8a;';
+    if (!labelAdded[monthKey] && colDate >= startDate) {
+      span.textContent = colDate.toLocaleString('default', { month: 'short' });
+      labelAdded[monthKey] = true;
+    }
+    weekLabelGrid.appendChild(span);
+  }
+  weekLabelGrid.style.cssText =
+    `display:grid;grid-auto-flow:column;grid-auto-columns:12px;gap:2px;overflow:hidden;`;
+  monthRow.appendChild(weekLabelGrid);
+  container.appendChild(monthRow);
+
+  // Per-person rows
+  ranked.filter(([,p]) => p.workout_dates && p.workout_dates.length > 0).forEach(([name, p]) => {
+    const row = document.createElement('div');
+    row.className = 'heatmap-row';
+
+    const label = document.createElement('div');
+    label.className = 'heatmap-label';
+    label.innerHTML = `<span class="heatmap-label-emoji">${p.emoji}</span>${name}`;
+    row.appendChild(label);
+
+    const grid = document.createElement('div');
+    grid.className = 'heatmap-grid';
+
+    const workoutSet = new Set(p.workout_dates);
+
+    // Placeholder cells for Mon–Wed before Jan 1
+    for (let i = 0; i < dayOffset; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'hm-cell hm-empty';
+      grid.appendChild(cell);
+    }
+
+    // One cell per day Jan 1 → today
+    const d = new Date(startDate);
+    while (d <= today) {
+      const iso = d.toISOString().slice(0, 10);
+      const cell = document.createElement('div');
+      cell.className = 'hm-cell';
+      if (workoutSet.has(iso)) {
+        cell.style.backgroundColor = p.color;
+      } else {
+        cell.style.backgroundColor = '#1e1e30';
+      }
+      cell.title = `${iso}${workoutSet.has(iso) ? ' 💪' : ''}`;
+      grid.appendChild(cell);
+      d.setDate(d.getDate() + 1);
+    }
+
+    row.appendChild(grid);
+    container.appendChild(row);
+  });
+}
+
+function renderMonthlyChart(ranked, dateRange) {
+  // Last 6 months
+  const today = new Date();
+  const months = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+    months.push(d.toISOString().slice(0, 7));
+  }
+  const labels = months.map(m => {
+    const d = new Date(m + '-01');
+    return d.toLocaleString('default', { month: 'short', year: '2-digit' });
+  });
+
+  const datasets = ranked.map(([name, p]) => ({
+    label: `${p.emoji} ${name}`,
+    data: months.map(m => p.monthly[m] || 0),
+    backgroundColor: p.color + 'CC',
+    borderColor: p.color,
+    borderWidth: 1.5,
+    borderRadius: 3,
+  }));
+
+  new Chart(document.getElementById('monthly-chart'), {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: '#aaa', padding: 12, boxWidth: 12, font: { size: 11 } } },
+      },
+      scales: {
+        x: { grid: { color: '#1f1f30' }, ticks: { color: '#6b6b8a' } },
+        y: { beginAtZero: true, grid: { color: '#1f1f30' }, ticks: { color: '#6b6b8a' } },
+      },
+    },
+  });
+}
+
+function renderStatCards(ranked) {
+  const cards = ranked.filter(([,p]) => p.in_cards);
+  document.getElementById('stat-cards').innerHTML = cards.map(([name, p]) => {
+    const streakFire = p.current_streak > 0
+      ? '🔥'.repeat(Math.min(p.current_streak, 5)) + ` ${p.current_streak}-day streak`
+      : '💤 No active streak';
+    const badgesHtml = (p.achievements||[]).map(b => {
+      const m = BADGE_META[b] || {label:b, cls:''};
+      return `<span class="badge ${m.cls}">${m.label}</span>`;
+    }).join('');
+
+    return `<div class="stat-card" style="--accent:${p.color}">
+      <div class="card-header">
+        <div class="card-emoji">${p.emoji}</div>
+        <div>
+          <div class="card-name">${name}</div>
+          <div class="card-streak">${streakFire}</div>
+        </div>
+        <div class="card-total" style="color:${p.color}">${p.total}</div>
+      </div>
+      <div class="card-mini">
+        <div class="mini-stat"><span class="mini-val">${p.weekly}</span><span class="mini-lbl">This week</span></div>
+        <div class="mini-stat"><span class="mini-val">${p.last30}</span><span class="mini-lbl">Last 30d</span></div>
+        <div class="mini-stat"><span class="mini-val">${p.best_streak}</span><span class="mini-lbl">Best streak</span></div>
+      </div>
+      ${badgesHtml ? `<div class="card-badges">${badgesHtml}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+/* ── Bootstrap ── */
+fetch('data/stats.json')
+  .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then(render)
+  .catch(err => {
+    document.querySelector('.container').innerHTML =
+      `<div style="padding:40px;text-align:center;color:#FF6B6B">
+        <h2>Could not load stats</h2>
+        <p style="color:#888;margin-top:8px">Run the parser, or serve via HTTP (not file://)</p>
+        <pre style="margin-top:16px;font-size:0.8rem;color:#555">${err}</pre>
+      </div>`;
+  });
+</script>
+</body>
+</html>

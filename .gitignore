@@ -1,0 +1,18 @@
+# WhatsApp chat exports — never commit raw messages
+_chat.txt
+*.zip
+WhatsApp Chat*/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Old files (superseded by this structure)
+/dashboard.html
+/parse_chat.py
