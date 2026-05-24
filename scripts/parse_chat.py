@@ -23,8 +23,9 @@ NAME_MAP = {
     'Sagar Daliya': 'Sagar',
     'Sahil Gupta': 'Sahil',
     'Rashmi': 'Rashmi',
-    'Beba\U0001F42F': 'Smriti',
-    'Beba🐯': 'Smriti',
+    'Beba\U0001F42F': 'Rhea',   # Beba🐯 = Rhea (different from Smriti)
+    'Beba🐯': 'Rhea',
+    'Rheakasset': 'Rhea',       # alternative username
     'Smriti': 'Smriti',
     'Harshvardhan Agarwal': 'Harsh',
     'Sharad Ranghar': 'Sharad',
@@ -44,7 +45,8 @@ PERSON_CONFIG = {
     'Sahil':  {'emoji': '🏋️', 'color': '#FF6584'},
     'Harsh':  {'emoji': '🏊', 'color': '#4FC3F7'},
     'Nikhar': {'emoji': '🎯', 'color': '#A8E063'},
-    'Smriti': {'emoji': '💃', 'color': '#FA709A'},
+    'Rhea':   {'emoji': '🐯', 'color': '#FA709A'},
+    'Smriti': {'emoji': '💃', 'color': '#C084FC'},
     'Ekansh': {'emoji': '🧘', 'color': '#B8B8FF'},
     'Jindal': {'emoji': '🦁', 'color': '#FFA07A'},
 }
@@ -110,16 +112,39 @@ def parse_messages(filepaths):
 
 
 def extract_workout_entries(messages):
-    """Return {person: [(workout_date, workout_num), ...]} for 2026 onwards."""
+    """Return {person: [(workout_date, workout_num), ...]} for 2026 onwards.
+
+    Any author not in NAME_MAP who posts a #N tag is auto-included under their
+    raw WhatsApp name (first word, title-cased) and a warning is printed so the
+    NAME_MAP can be updated for future runs.
+    """
     entries = defaultdict(list)
+    unknown_warned = set()
 
     for msg in messages:
         if msg['dt'].year < 2026:
             continue
 
-        author = NAME_MAP.get(msg['author'])
+        raw_author = msg['author']
+        author = NAME_MAP.get(raw_author)
+
+        # Auto-discover: include unknown authors who post #N tags
         if not author:
-            continue
+            text_probe = msg['text']
+            if HASH_RE.search(text_probe):
+                if raw_author not in unknown_warned:
+                    # Derive a short display name (first word, title-cased)
+                    display = raw_author.split()[0].title()
+                    print(f'  ⚠ Unknown author posting #N: {repr(raw_author)} → using "{display}"',
+                          file=sys.stderr)
+                    print(f'    Add to NAME_MAP: {repr(raw_author)!r}: {repr(display)!r}',
+                          file=sys.stderr)
+                    unknown_warned.add(raw_author)
+                    # Register dynamically so we capture their data
+                    NAME_MAP[raw_author] = raw_author.split()[0].title()
+                author = NAME_MAP.get(raw_author)
+            if not author:
+                continue
 
         text = msg['text']
         msg_date = msg['dt'].date()
@@ -190,7 +215,9 @@ def compute_timeseries(entries):
     """Monotonically-increasing {date, count} list for the race chart.
 
     Only emits a point when the count increases, so Chart.js spanGaps fills
-    the flat parts. Starts with a 2026-01-01 baseline of 0.
+    the flat parts.  The zero baseline is placed one day before the person's
+    first recorded post (never earlier than 2026-01-01), so late starters
+    don't get a misleading straight line extrapolated back to January.
     """
     if not entries:
         return []
@@ -200,7 +227,11 @@ def compute_timeseries(entries):
     for d, n in entries:
         by_date[d] = max(by_date.get(d, 0), n)
 
-    result = [{'date': '2026-01-01', 'count': 0}]
+    first_date = min(by_date.keys())
+    # Zero baseline: 1 day before first post, clamped to Jan 1
+    baseline = max(date(2026, 1, 1), first_date - timedelta(days=1))
+    result = [{'date': baseline.isoformat(), 'count': 0}]
+
     running_max = 0
     for d in sorted(by_date.keys()):
         n = by_date[d]
