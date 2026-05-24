@@ -23,9 +23,9 @@ NAME_MAP = {
     'Sagar Daliya': 'Sagar',
     'Sahil Gupta': 'Sahil',
     'Rashmi': 'Rashmi',
-    'Beba\U0001F42F': 'Rhea',   # Beba🐯 = Rhea (different from Smriti)
-    'Beba🐯': 'Rhea',
-    'Rheakasset': 'Rhea',       # alternative username
+    'Beba\U0001F42F': 'Riya',   # Beba🐯 = Riya (different from Smriti)
+    'Beba🐯': 'Riya',
+    'Rheakasset': 'Riya',       # alternative username
     'Smriti': 'Smriti',
     'Harshvardhan Agarwal': 'Harsh',
     'Sharad Ranghar': 'Sharad',
@@ -45,7 +45,7 @@ PERSON_CONFIG = {
     'Sahil':  {'emoji': '🏋️', 'color': '#FF6584'},
     'Harsh':  {'emoji': '🏊', 'color': '#4FC3F7'},
     'Nikhar': {'emoji': '🎯', 'color': '#A8E063'},
-    'Rhea':   {'emoji': '🐯', 'color': '#FA709A'},
+    'Riya':   {'emoji': '🐯', 'color': '#FA709A', 'backfill': True},
     'Smriti': {'emoji': '💃', 'color': '#C084FC'},
     'Ekansh': {'emoji': '🧘', 'color': '#B8B8FF'},
     'Jindal': {'emoji': '🦁', 'color': '#FFA07A'},
@@ -211,13 +211,17 @@ def calc_streaks(dates_set):
     return best, current
 
 
-def compute_timeseries(entries):
+def compute_timeseries(entries, backfill=False):
     """Monotonically-increasing {date, count} list for the race chart.
 
     Only emits a point when the count increases, so Chart.js spanGaps fills
-    the flat parts.  The zero baseline is placed one day before the person's
-    first recorded post (never earlier than 2026-01-01), so late starters
-    don't get a misleading straight line extrapolated back to January.
+    the flat parts.
+
+    backfill=True  → baseline is Jan 1 (for members who were doing workouts
+                     before they started posting — the chart shows estimated
+                     steady activity from the start of the year).
+    backfill=False → baseline is 1 day before first post, so late starters
+                     don't get a fake straight line projected back to January.
     """
     if not entries:
         return []
@@ -228,8 +232,11 @@ def compute_timeseries(entries):
         by_date[d] = max(by_date.get(d, 0), n)
 
     first_date = min(by_date.keys())
-    # Zero baseline: 1 day before first post, clamped to Jan 1
-    baseline = max(date(2026, 1, 1), first_date - timedelta(days=1))
+    if backfill:
+        baseline = date(2026, 1, 1)
+    else:
+        # 1 day before first post, clamped to Jan 1
+        baseline = max(date(2026, 1, 1), first_date - timedelta(days=1))
     result = [{'date': baseline.isoformat(), 'count': 0}]
 
     running_max = 0
@@ -307,7 +314,10 @@ def build_stats(entries):
             'current_streak': current_streak,
             'last_date': last_date.isoformat(),
             'days_since': days_since,
-            'timeseries': compute_timeseries(workout_list),
+            'timeseries': compute_timeseries(
+                workout_list,
+                backfill=PERSON_CONFIG.get(person, {}).get('backfill', False),
+            ),
             'workout_dates': sorted(d.isoformat() for d in dates_set),
             'achievements': compute_achievements(total, best_streak, dict(monthly)),
             'emoji': PERSON_CONFIG.get(person, {}).get('emoji', ''),

@@ -464,7 +464,7 @@ function renderLeaderboard(ranked) {
       <td>
         <div class="person-cell">
           <span class="person-dot" style="background:${p.color}"></span>
-          <span class="person-name">${p.emoji} ${name}</span>
+          <a class="person-name" href="people/?name=${encodeURIComponent(name)}" style="color:inherit;text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${p.emoji} ${name}</a>
         </div>
       </td>
       <td class="num" style="font-weight:700">${p.total}</td>
@@ -673,6 +673,13 @@ function renderMonthlyChart(ranked, dateRange) {
   });
 }
 
+// Photos are served from /images/{name}.jpg — presence checked optimistically
+// (browser silently ignores 404 via onerror). No server-side check needed.
+function hasPhoto(name) {
+  // We always render the img tag; onerror hides it if not found.
+  return true;
+}
+
 function renderStatCards(ranked) {
   const cards = ranked.filter(([,p]) => p.in_cards);
   document.getElementById('stat-cards').innerHTML = cards.map(([name, p]) => {
@@ -684,9 +691,11 @@ function renderStatCards(ranked) {
       return `<span class="badge ${m.cls}">${m.label}</span>`;
     }).join('');
 
-    return `<div class="stat-card" style="--accent:${p.color}">
+    return `<div class="stat-card" style="--accent:${p.color};cursor:pointer;" onclick="location.href='people/?name=${encodeURIComponent(name)}'">
       <div class="card-header">
-        <div class="card-emoji">${p.emoji}</div>
+        <div class="card-emoji" style="position:relative;">
+          ${hasPhoto(name) ? `<img src="images/${name.toLowerCase()}.jpg" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid ${p.color}40;" onerror="this.style.display='none'">` : p.emoji}
+        </div>
         <div>
           <div class="card-name">${name}</div>
           <div class="card-streak">${streakFire}</div>
@@ -699,6 +708,9 @@ function renderStatCards(ranked) {
         <div class="mini-stat"><span class="mini-val">${p.best_streak}</span><span class="mini-lbl">Best streak</span></div>
       </div>
       ${badgesHtml ? `<div class="card-badges">${badgesHtml}</div>` : ''}
+      <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);text-align:right;">
+        View profile →
+      </div>
     </div>`;
   }).join('');
 }

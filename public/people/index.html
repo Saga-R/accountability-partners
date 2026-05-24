@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile · Accountability Partners</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <style>
+    :root {
+      --bg: #0d0d0d; --card: #161616; --border: #2a2a2a;
+      --text: #e8e8e8; --muted: #666; --accent: #6C63FF;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; }
+
+    /* ── nav ── */
+    .nav { padding: 16px 32px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+    .nav a { color: var(--muted); text-decoration: none; font-size: 14px; }
+    .nav a:hover { color: var(--text); }
+    .nav .sep { color: var(--border); }
+
+    /* ── hero ── */
+    .hero { max-width: 900px; margin: 48px auto 0; padding: 0 24px; display: flex; gap: 32px; align-items: flex-start; }
+    .avatar-wrap { position: relative; flex-shrink: 0; }
+    .avatar { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--border); background: var(--card); display: flex; align-items: center; justify-content: center; font-size: 56px; overflow: hidden; }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .avatar-emoji { font-size: 56px; line-height: 1; }
+    .status-dot { position: absolute; bottom: 6px; right: 6px; width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--bg); }
+    .status-dot.active { background: #22c55e; }
+    .status-dot.inactive { background: var(--muted); }
+
+    .hero-info { flex: 1; }
+    .hero-name { font-size: 36px; font-weight: 800; margin-bottom: 4px; display: flex; align-items: center; gap: 12px; }
+    .hero-tagline { color: var(--muted); font-size: 15px; margin-bottom: 20px; line-height: 1.5; }
+    .hero-meta { display: flex; gap: 32px; flex-wrap: wrap; }
+    .hero-stat { text-align: center; }
+    .hero-stat .val { font-size: 28px; font-weight: 800; }
+    .hero-stat .lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-top: 2px; }
+
+    /* rank badge */
+    .rank-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 4px 12px; font-size: 13px; font-weight: 700; margin-bottom: 12px; }
+
+    /* ── sections ── */
+    .content { max-width: 900px; margin: 40px auto 80px; padding: 0 24px; display: grid; gap: 24px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
+    .card-title { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 18px; }
+
+    /* ── achievements ── */
+    .badges { display: flex; flex-wrap: wrap; gap: 10px; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+    .badge.gold { background: #3d2e00; color: #fbbf24; border: 1px solid #92400e; }
+    .badge.fire { background: #2d1200; color: #fb923c; border: 1px solid #92400e; }
+    .badge.purple { background: #1e1030; color: #a78bfa; border: 1px solid #4c1d95; }
+    .badge.locked { background: #1a1a1a; color: var(--muted); border: 1px solid var(--border); opacity: .5; }
+
+    /* ── mini stats grid ── */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 14px; }
+    .stat-box { background: #1a1a1a; border-radius: 12px; padding: 16px; }
+    .stat-box .v { font-size: 24px; font-weight: 800; }
+    .stat-box .l { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-top: 4px; }
+
+    /* ── charts ── */
+    .chart-wrap { position: relative; height: 220px; }
+
+    /* ── heatmap ── */
+    .heatmap-scroll { overflow-x: auto; padding-bottom: 4px; }
+    .heatmap-grid { display: inline-grid; grid-template-rows: repeat(7, 11px); grid-auto-flow: column; gap: 2px; }
+    .hm-cell { width: 11px; height: 11px; border-radius: 2px; }
+    .hm-empty { background: transparent; }
+    .hm-month-labels { display: flex; gap: 2px; margin-bottom: 4px; font-size: 10px; color: var(--muted); overflow-x: auto; }
+    .hm-day-labels { display: grid; grid-template-rows: repeat(7, 11px); gap: 2px; margin-right: 6px; font-size: 9px; color: var(--muted); flex-shrink: 0; }
+
+    /* ── milestones timeline ── */
+    .timeline { display: flex; flex-direction: column; gap: 12px; }
+    .tl-item { display: flex; gap: 14px; align-items: flex-start; }
+    .tl-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+    .tl-line { display: flex; flex-direction: column; }
+    .tl-label { font-size: 14px; font-weight: 600; }
+    .tl-date { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    /* ── vs group ── */
+    .vs-bar-wrap { display: flex; flex-direction: column; gap: 10px; }
+    .vs-row { display: flex; align-items: center; gap: 10px; }
+    .vs-name { width: 80px; font-size: 13px; color: var(--muted); text-align: right; flex-shrink: 0; }
+    .vs-name.self { color: var(--text); font-weight: 700; }
+    .vs-bar-bg { flex: 1; height: 10px; border-radius: 5px; background: #1f1f1f; overflow: hidden; }
+    .vs-bar-fill { height: 100%; border-radius: 5px; transition: width .6s ease; }
+    .vs-val { width: 36px; font-size: 12px; color: var(--muted); text-align: right; flex-shrink: 0; }
+
+    /* ── pace ── */
+    .pace-bar-bg { height: 14px; border-radius: 7px; background: #1f1f1f; overflow: hidden; margin: 10px 0; }
+    .pace-bar-fill { height: 100%; border-radius: 7px; }
+    .pace-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+
+    /* ── loading / error ── */
+    #loading, #error { text-align: center; padding: 120px 24px; color: var(--muted); }
+    #error { color: #f87171; }
+
+    @media (max-width: 600px) {
+      .hero { flex-direction: column; align-items: center; text-align: center; }
+      .hero-meta { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/">🏠 Home</a>
+  <span class="sep">›</span>
+  <span id="nav-name">Profile</span>
+</nav>
+
+<div id="loading">Loading profile…</div>
+<div id="error" style="display:none"></div>
+
+<div id="app" style="display:none">
+  <!-- Hero -->
+  <div class="hero">
+    <div class="avatar-wrap">
+      <div class="avatar" id="avatar-el">
+        <span class="avatar-emoji" id="avatar-emoji"></span>
+      </div>
+      <div class="status-dot" id="status-dot"></div>
+    </div>
+    <div class="hero-info">
+      <div class="rank-badge" id="rank-badge"></div>
+      <div class="hero-name">
+        <span id="hero-name-text"></span>
+      </div>
+      <div class="hero-tagline" id="hero-tagline"></div>
+      <div class="hero-meta">
+        <div class="hero-stat"><div class="val" id="hstat-total"></div><div class="lbl">Total 2026</div></div>
+        <div class="hero-stat"><div class="val" id="hstat-streak"></div><div class="lbl">Current Streak</div></div>
+        <div class="hero-stat"><div class="val" id="hstat-best"></div><div class="lbl">Best Streak</div></div>
+        <div class="hero-stat"><div class="val" id="hstat-month"></div><div class="lbl">This Month</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content sections -->
+  <div class="content">
+
+    <!-- Pace card -->
+    <div class="card" id="pace-card">
+      <div class="card-title">📈 Year Pace</div>
+      <div id="pace-text" style="font-size:15px; margin-bottom:10px;"></div>
+      <div class="pace-bar-bg"><div class="pace-bar-fill" id="pace-bar"></div></div>
+      <div class="pace-meta"><span>Jan 1</span><span id="pace-today-label"></span><span>Dec 31</span></div>
+    </div>
+
+    <!-- Achievements -->
+    <div class="card">
+      <div class="card-title">🏅 Achievements</div>
+      <div class="badges" id="badges-wrap"></div>
+    </div>
+
+    <!-- Stats grid -->
+    <div class="card">
+      <div class="card-title">📊 Stats Breakdown</div>
+      <div class="stats-grid" id="stats-grid"></div>
+    </div>
+
+    <!-- Activity Heatmap -->
+    <div class="card">
+      <div class="card-title">🗓 Activity Calendar — Jan → Today</div>
+      <div style="display:flex; align-items:flex-start;">
+        <div class="hm-day-labels">
+          <span></span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span></span>
+        </div>
+        <div>
+          <div class="hm-month-labels" id="hm-months"></div>
+          <div class="heatmap-scroll"><div class="heatmap-grid" id="heatmap"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Monthly bar chart -->
+    <div class="card">
+      <div class="card-title">📅 Monthly Activity</div>
+      <div class="chart-wrap"><canvas id="monthChart"></canvas></div>
+    </div>
+
+    <!-- Race chart (person highlighted) -->
+    <div class="card">
+      <div class="card-title">📈 Race Chart — Position vs Group</div>
+      <div class="chart-wrap" style="height:280px;"><canvas id="raceChart"></canvas></div>
+    </div>
+
+    <!-- Milestone timeline -->
+    <div class="card" id="timeline-card">
+      <div class="card-title">🏁 Milestones</div>
+      <div class="timeline" id="timeline"></div>
+    </div>
+
+    <!-- vs group bar -->
+    <div class="card">
+      <div class="card-title">🏆 vs The Group (Last 30 Days)</div>
+      <div class="vs-bar-wrap" id="vs-bars"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── helpers ──────────────────────────────────────────────────────────────────
+function qs(id) { return document.getElementById(id); }
+function fmt(n) { return n === 1 ? '1 day' : `${n} days`; }
+function dateLabel(iso) {
+  const d = new Date(iso + 'T00:00:00');
+  return d.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+}
+
+// ── badge metadata ────────────────────────────────────────────────────────────
+const BADGE_META = {
+  w25:  { label: '🎯 25 workouts',  cls: 'gold',   desc: 'Hit 25 workouts' },
+  w50:  { label: '🏅 50 workouts',  cls: 'gold',   desc: 'Hit 50 workouts' },
+  w75:  { label: '⭐ 75 workouts',  cls: 'gold',   desc: 'Hit 75 workouts' },
+  w100: { label: '💯 100 workouts', cls: 'gold',   desc: 'Century club!' },
+  w125: { label: '🌟 125 workouts', cls: 'gold',   desc: '125 workouts — elite!' },
+  s7:   { label: '🔥 7-day streak', cls: 'fire',   desc: '7 days in a row' },
+  s14:  { label: '🔥 14-day streak',cls: 'fire',   desc: '2 weeks straight' },
+  s30:  { label: '🔥 30-day streak',cls: 'fire',   desc: 'Full month streak' },
+  consistent_month: { label: '📅 Iron Month', cls: 'purple', desc: '20+ days in a single month' },
+};
+const ALL_BADGES = ['w25','w50','w75','w100','w125','s7','s14','s30','consistent_month'];
+
+// ── tagline generator ─────────────────────────────────────────────────────────
+function generateTagline(name, stats, rank) {
+  const { total, best_streak, current_streak, last7, days_since } = stats;
+  if (current_streak >= 14)
+    return `On an absolute tear — ${current_streak} days straight and counting 🔥`;
+  if (current_streak >= 7)
+    return `Week-long streak in progress. The group can feel the heat 💪`;
+  if (days_since === 0)
+    return `Already done for today. That's the energy. ✅`;
+  if (days_since === 1)
+    return `Worked out yesterday. Consistency is the game 🎯`;
+  if (rank === 1)
+    return `Leading the pack with ${total} workouts. Setting the pace for everyone 🥇`;
+  if (best_streak >= 14)
+    return `A ${best_streak}-day best streak shows what's possible when it clicks 💫`;
+  if (last7 >= 5)
+    return `5 sessions in the last 7 days — one of the most active in the group this week 🚀`;
+  if (days_since > 30)
+    return `Life happened, but every comeback starts with one workout. Come back strong 💪`;
+  return `Every rep counts. ${total} down, more to come 🏋️`;
+}
+
+// ── heatmap builder ───────────────────────────────────────────────────────────
+function buildHeatmap(workoutDates, color) {
+  const container = qs('heatmap');
+  const monthLabels = qs('hm-months');
+  container.innerHTML = '';
+  monthLabels.innerHTML = '';
+
+  const workoutSet = new Set(workoutDates);
+  const startDate = new Date('2026-01-01T00:00:00');
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  // Jan 1 is a Thursday → dayIndex (Mon=0) = 3
+  const dayOffset = (startDate.getDay() + 6) % 7; // 3
+
+  // total weeks needed
+  const totalDays = Math.floor((today - startDate) / 86400000) + 1;
+  const totalWeeks = Math.ceil((totalDays + dayOffset) / 7);
+
+  // month label positions
+  const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  let lastMonth = -1;
+  const monthCols = {};
+
+  for (let col = 0; col < totalWeeks; col++) {
+    for (let row = 0; row < 7; row++) {
+      const dayIndex = col * 7 + row - dayOffset;
+      if (dayIndex < 0 || dayIndex >= totalDays) continue;
+      const d = new Date(startDate);
+      d.setDate(startDate.getDate() + dayIndex);
+      if (d > today) continue;
+      const m = d.getMonth();
+      if (m !== lastMonth) { monthCols[col] = monthNames[m]; lastMonth = m; }
+    }
+  }
+
+  // Build month label row
+  let monthLabelHtml = '';
+  for (let col = 0; col < totalWeeks; col++) {
+    const label = monthCols[col] || '';
+    monthLabelHtml += `<span style="min-width:${label ? 'auto' : '13px'};display:inline-block;">${label}</span>`;
+  }
+  monthLabels.innerHTML = monthLabelHtml;
+
+  // Build cells
+  for (let col = 0; col < totalWeeks; col++) {
+    for (let row = 0; row < 7; row++) {
+      const cell = document.createElement('div');
+      const dayIndex = col * 7 + row - dayOffset;
+      if (dayIndex < 0) {
+        cell.className = 'hm-cell hm-empty';
+      } else {
+        const d = new Date(startDate);
+        d.setDate(startDate.getDate() + dayIndex);
+        if (d > today) {
+          cell.className = 'hm-cell hm-empty';
+        } else {
+          const iso = d.toISOString().slice(0,10);
+          const active = workoutSet.has(iso);
+          cell.className = 'hm-cell';
+          cell.style.background = active ? color : '#1f1f1f';
+          cell.style.opacity = active ? '1' : '1';
+          cell.title = iso + (active ? ' ✅' : '');
+        }
+      }
+      container.appendChild(cell);
+    }
+  }
+}
+
+// ── main ──────────────────────────────────────────────────────────────────────
+async function init() {
+  const params = new URLSearchParams(location.search);
+  const targetName = params.get('name');
+
+  if (!targetName) {
+    qs('loading').style.display = 'none';
+    qs('error').style.display = 'block';
+    qs('error').textContent = 'No name specified. Add ?name=Arjit to the URL.';
+    return;
+  }
+
+  let data;
+  try {
+    const res = await fetch('../data/stats.json');
+    if (!res.ok) throw new Error(res.statusText);
+    data = await res.json();
+  } catch(e) {
+    qs('loading').style.display = 'none';
+    qs('error').style.display = 'block';
+    qs('error').textContent = 'Could not load stats.json. Run via HTTP server (not file://).';
+    return;
+  }
+
+  const people = data.people;
+  const stats = people[targetName];
+  if (!stats) {
+    qs('loading').style.display = 'none';
+    qs('error').style.display = 'block';
+    qs('error').textContent = `Person "${targetName}" not found in data.`;
+    return;
+  }
+
+  // Rank
+  const ranked = Object.entries(people).sort((a,b) => b[1].total - a[1].total);
+  const rank = ranked.findIndex(([n]) => n === targetName) + 1;
+  const medals = ['🥇','🥈','🥉'];
+  const rankLabel = rank <= 3 ? medals[rank-1] : `#${rank}`;
+
+  // ── populate hero ────────────────────────────────────────────────────────
+  document.title = `${targetName} · Accountability Partners`;
+  qs('nav-name').textContent = targetName;
+
+  // Photo or emoji
+  const imgEl = document.createElement('img');
+  imgEl.src = `../images/${targetName.toLowerCase()}.jpg`;
+  imgEl.alt = targetName;
+  imgEl.onerror = () => { imgEl.remove(); };
+  imgEl.onload = () => { qs('avatar-emoji').style.display = 'none'; qs('avatar-el').appendChild(imgEl); };
+  qs('avatar-emoji').textContent = stats.emoji;
+
+  const dot = qs('status-dot');
+  dot.className = 'status-dot ' + (stats.days_since <= 1 ? 'active' : 'inactive');
+  dot.title = stats.days_since <= 1 ? 'Active recently' : `Last active ${stats.days_since}d ago`;
+
+  qs('rank-badge').innerHTML = `${rankLabel} ${rank <= 3 ? 'on the leaderboard' : `Rank ${rank} of ${ranked.length}`}`;
+  qs('rank-badge').style.borderColor = stats.color;
+
+  qs('hero-name-text').textContent = `${stats.emoji} ${targetName}`;
+  qs('hero-tagline').textContent = generateTagline(targetName, stats, rank);
+
+  qs('hstat-total').textContent = stats.total;
+  qs('hstat-streak').innerHTML = stats.current_streak > 0
+    ? `🔥 ${stats.current_streak}d` : '—';
+  qs('hstat-best').textContent = `${stats.best_streak}d`;
+  qs('hstat-month').textContent = stats.this_month;
+
+  // ── pace card ────────────────────────────────────────────────────────────
+  const startOfYear = new Date('2026-01-01T00:00:00');
+  const endOfYear   = new Date('2026-12-31T00:00:00');
+  const today       = new Date(); today.setHours(0,0,0,0);
+  const dayOfYear   = Math.floor((today - startOfYear) / 86400000) + 1;
+  const daysInYear  = 365;
+  const yearPct     = dayOfYear / daysInYear;
+  const projectedYE = Math.round(stats.total / yearPct);
+  const onPaceFor   = Math.round(yearPct * (stats.total / yearPct)); // same as total, just clarifying
+
+  qs('pace-text').innerHTML =
+    `<strong>${stats.total}</strong> workouts through day ${dayOfYear} of 365 · ` +
+    `On pace for <strong>${projectedYE}</strong> by Dec 31`;
+  const paceBar = qs('pace-bar');
+  const maxTotal = Math.max(...Object.values(people).map(s => s.total));
+  paceBar.style.width = `${Math.min(100, (stats.total / Math.max(projectedYE, maxTotal)) * 100)}%`;
+  paceBar.style.background = stats.color;
+  qs('pace-today-label').textContent = `Today (day ${dayOfYear})`;
+
+  // ── achievements ─────────────────────────────────────────────────────────
+  const badgesWrap = qs('badges-wrap');
+  const earned = new Set(stats.achievements || []);
+  ALL_BADGES.forEach(key => {
+    const meta = BADGE_META[key];
+    const div = document.createElement('div');
+    div.className = 'badge ' + (earned.has(key) ? meta.cls : 'locked');
+    div.textContent = meta.label;
+    div.title = meta.desc;
+    badgesWrap.appendChild(div);
+  });
+
+  // ── stats grid ───────────────────────────────────────────────────────────
+  const statsGrid = qs('stats-grid');
+  const statItems = [
+    { v: stats.total,          l: 'Total Workouts' },
+    { v: stats.last30,         l: 'Last 30 Days' },
+    { v: stats.last7,          l: 'Last 7 Days' },
+    { v: stats.this_month,     l: 'This Month' },
+    { v: stats.current_streak ? stats.current_streak + 'd' : '—', l: 'Current Streak' },
+    { v: stats.best_streak + 'd', l: 'Best Streak' },
+    { v: stats.days_since === 0 ? 'Today' : stats.days_since + 'd ago', l: 'Last Active' },
+    { v: rankLabel,             l: 'Group Rank' },
+  ];
+  statItems.forEach(({ v, l }) => {
+    statsGrid.innerHTML += `<div class="stat-box"><div class="v">${v}</div><div class="l">${l}</div></div>`;
+  });
+
+  // ── heatmap ──────────────────────────────────────────────────────────────
+  buildHeatmap(stats.workout_dates, stats.color);
+
+  // ── monthly bar chart ────────────────────────────────────────────────────
+  const monthlyData = stats.monthly || {};
+  const allMonths = data.people[targetName] ? Object.keys(monthlyData).sort() : [];
+  new Chart(qs('monthChart'), {
+    type: 'bar',
+    data: {
+      labels: allMonths.map(m => {
+        const [y, mo] = m.split('-');
+        return new Date(+y, +mo - 1).toLocaleDateString('en-IN', { month:'short', year:'2-digit' });
+      }),
+      datasets: [{
+        label: targetName,
+        data: allMonths.map(m => monthlyData[m] || 0),
+        backgroundColor: stats.color + 'cc',
+        borderColor: stats.color,
+        borderWidth: 1,
+        borderRadius: 4,
+      }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: '#222' }, ticks: { color: '#888' } },
+        y: { grid: { color: '#222' }, ticks: { color: '#888', stepSize: 5 }, beginAtZero: true },
+      },
+    },
+  });
+
+  // ── race chart ───────────────────────────────────────────────────────────
+  const raceDatasets = ranked.map(([name, s]) => {
+    const isSelf = name === targetName;
+    return {
+      label: name,
+      data: s.timeseries.map(pt => ({ x: pt.date, y: pt.count })),
+      borderColor: isSelf ? s.color : s.color + '33',
+      backgroundColor: 'transparent',
+      borderWidth: isSelf ? 3 : 1,
+      pointRadius: 0,
+      tension: 0,
+      spanGaps: true,
+      order: isSelf ? 0 : 1,
+    };
+  });
+  new Chart(qs('raceChart'), {
+    type: 'line',
+    data: { datasets: raceDatasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          filter: item => item.datasetIndex === ranked.findIndex(([n]) => n === targetName),
+          callbacks: { title: items => items[0]?.label || '' },
+        },
+      },
+      scales: {
+        x: {
+          type: 'time',
+          time: { unit: 'month', tooltipFormat: 'MMM d' },
+          grid: { color: '#222' },
+          ticks: { color: '#888' },
+          min: '2026-01-01',
+          max: today.toISOString().slice(0, 10),
+        },
+        y: {
+          grid: { color: '#222' },
+          ticks: { color: '#888' },
+          beginAtZero: true,
+        },
+      },
+    },
+  });
+
+  // ── milestones timeline ──────────────────────────────────────────────────
+  const timeline = qs('timeline');
+  const milestones = [];
+
+  // First workout
+  if (stats.workout_dates.length > 0) {
+    milestones.push({ label: '🏁 First workout of 2026', date: stats.workout_dates[0], color: stats.color });
+  }
+
+  // Count milestones: find date when they first hit 25, 50, 75, 100, 125
+  const ts = stats.timeseries;
+  [25, 50, 75, 100, 125].forEach(n => {
+    const pt = ts.find(p => p.count >= n);
+    if (pt && pt.date !== '2026-01-01') {
+      milestones.push({ label: `🏅 Hit #${n}`, date: pt.date, color: stats.color });
+    }
+  });
+
+  // Best streak (if notable)
+  if (stats.best_streak >= 7) {
+    milestones.push({ label: `🔥 ${stats.best_streak}-day best streak`, date: stats.last_date, color: '#fb923c' });
+  }
+
+  milestones.sort((a, b) => a.date.localeCompare(b.date));
+
+  if (milestones.length === 0) {
+    qs('timeline-card').style.display = 'none';
+  } else {
+    milestones.forEach(m => {
+      timeline.innerHTML += `
+        <div class="tl-item">
+          <div class="tl-dot" style="background:${m.color};"></div>
+          <div class="tl-line">
+            <div class="tl-label">${m.label}</div>
+            <div class="tl-date">${dateLabel(m.date)}</div>
+          </div>
+        </div>`;
+    });
+  }
+
+  // ── vs group (last 30d) ──────────────────────────────────────────────────
+  const vsBars = qs('vs-bars');
+  const maxLast30 = Math.max(...Object.values(people).map(s => s.last30));
+  ranked.forEach(([name, s]) => {
+    const isSelf = name === targetName;
+    vsBars.innerHTML += `
+      <div class="vs-row">
+        <div class="vs-name ${isSelf ? 'self' : ''}">${s.emoji} ${name}</div>
+        <div class="vs-bar-bg">
+          <div class="vs-bar-fill" style="width:${maxLast30 > 0 ? (s.last30 / maxLast30 * 100) : 0}%;background:${isSelf ? s.color : s.color + '55'};"></div>
+        </div>
+        <div class="vs-val">${s.last30}</div>
+      </div>`;
+  });
+
+  // Show page
+  qs('loading').style.display = 'none';
+  qs('app').style.display = 'block';
+}
+
+init();
+</script>
+</body>
+</html>
