@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Parse WhatsApp Accountability Partners chat → public/data/stats.json
+Parse WhatsApp Accountability Partners chat → docs/data/stats.json
 
 Usage:
-    python scripts/parse_chat.py file1.txt [file2.txt ...] [--output public/data/stats.json]
+    python scripts/parse_chat.py file1.txt [file2.txt ...] [--output docs/data/stats.json]
 
 Multiple files are merged and deduplicated by (timestamp, author) before parsing.
 The _chat.txt file is never committed — only stats.json is.
@@ -453,7 +453,7 @@ def print_weekly_summary(data, url='[your-site-url]'):
 def main():
     parser = argparse.ArgumentParser(description='Parse WhatsApp chat → stats.json')
     parser.add_argument('chat_files', nargs='+', help='One or more _chat.txt files')
-    parser.add_argument('--output', default='public/data/stats.json', help='Output JSON path')
+    parser.add_argument('--output', default='docs/data/stats.json', help='Output JSON path')
     parser.add_argument('--url', default='[your-site-url]', help='Site URL for weekly summary')
     args = parser.parse_args()
 

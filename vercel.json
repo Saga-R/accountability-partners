@@ -1,5 +1,5 @@
 {
-  "outputDirectory": "public",
+  "outputDirectory": "docs",
   "rewrites": [
     { "source": "/(.*)", "destination": "/$1" }
   ]

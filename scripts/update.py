@@ -7,7 +7,7 @@ Usage:
 
 What it does:
     1. Runs parse_chat.py against your chat file(s)
-    2. Writes public/data/stats.json
+    2. Writes docs/data/stats.json
     3. Prints a ready-to-paste WhatsApp weekly summary
     4. With --push: commits stats.json and pushes to GitHub (triggers Vercel deploy)
 
@@ -24,7 +24,7 @@ from pathlib import Path
 # Repo root = parent of this script's directory
 REPO_ROOT = Path(__file__).parent.parent
 PARSER = REPO_ROOT / 'scripts' / 'parse_chat.py'
-OUTPUT = REPO_ROOT / 'public' / 'data' / 'stats.json'
+OUTPUT = REPO_ROOT / 'docs' / 'data' / 'stats.json'
 
 DEFAULT_URL = 'https://accountability-partners.vercel.app'
 
@@ -95,12 +95,12 @@ def main():
         from datetime import date
         today = date.today().isoformat()
 
-        run(['git', 'add', 'public/data/stats.json'])
+        run(['git', 'add', 'docs/data/stats.json'])
         run(['git', 'commit', '-m', f'Stats update {today}'])
         run(['git', 'push'])
         print(f'\n✓ Deployed! Check {args.url} in ~30 seconds.')
     else:
-        print(f'\n✓ Done. Open public/index.html via HTTP to preview.')
+        print(f'\n✓ Done. Open docs/index.html via HTTP to preview.')
         print(f'  To deploy: python scripts/update.py --chat <file> --push')
 
 
