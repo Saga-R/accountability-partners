@@ -29,21 +29,26 @@ OUTPUT = REPO_ROOT / 'docs' / 'data' / 'stats.json'
 DEFAULT_URL = 'https://accountability-partners.vercel.app'
 
 
-def find_latest_chat_export():
-    """Auto-detect the most recent WhatsApp export in ~/Downloads."""
-    patterns = [
-        os.path.expanduser('~/Downloads/WhatsApp Chat - Accountability Partners*/_chat.txt'),
-        os.path.expanduser('~/Downloads/WhatsApp Chat - Accountability Partners*/_chat.txt'),
-        os.path.expanduser('~/Downloads/*accountability*/_chat.txt'),
-        os.path.expanduser('~/Downloads/*Accountability*/_chat.txt'),
-    ]
-    found = []
-    for pat in patterns:
-        found.extend(glob.glob(pat))
+def find_all_chat_exports():
+    """Auto-detect ALL WhatsApp Accountability Partners exports in ~/Downloads.
+
+    We always want to parse every export together so the older file's #1 posts
+    (Jan 1) are included — the parser deduplicates by (timestamp, author).
+    Returns list sorted oldest-first (by mtime).
+    """
+    pattern = os.path.expanduser(
+        '~/Downloads/WhatsApp Chat - Accountability Partners*/_chat.txt'
+    )
+    found = glob.glob(pattern)
     if not found:
-        return None
-    # Most recently modified
-    return max(found, key=os.path.getmtime)
+        # Fallback: looser match
+        for pat in [
+            os.path.expanduser('~/Downloads/*accountability*/_chat.txt'),
+            os.path.expanduser('~/Downloads/*Accountability*/_chat.txt'),
+        ]:
+            found.extend(glob.glob(pat))
+    # Sort oldest first so deduplication keeps the original timestamps
+    return sorted(set(found), key=os.path.getmtime)
 
 
 def run(cmd, check=True):
@@ -66,14 +71,15 @@ def main():
 
     chats = args.chats or []
 
-    # Auto-detect if no files given
+    # Auto-detect if no files given — pick up ALL exports so older #1 posts
+    # (Jan 1 data) are always included alongside the latest export.
     if not chats:
-        latest = find_latest_chat_export()
-        if latest:
-            print(f'  Auto-detected: {latest}')
-            chats = [latest]
+        chats = find_all_chat_exports()
+        if chats:
+            for c in chats:
+                print(f'  Auto-detected: {c}')
         else:
-            print('✗ No chat file found. Pass --chat /path/to/_chat.txt', file=sys.stderr)
+            print('✗ No chat files found. Pass --chat /path/to/_chat.txt', file=sys.stderr)
             sys.exit(1)
 
     # Verify files exist
