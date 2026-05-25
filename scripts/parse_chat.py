@@ -54,6 +54,44 @@ PERSON_CONFIG = {
 # Shown only in leaderboard, not individual stat cards
 CARDS_EXCLUDE = {'Smriti', 'Ekansh', 'Jindal'}
 
+# ── Activity Categorisation ───────────────────────────────────────────────────
+# Keywords are matched case-insensitively against the full workout message text.
+# First category that matches wins; longest / most specific keywords are listed
+# first within each group so they take priority over short generic ones.
+
+ACTIVITY_CATEGORIES = {
+    'Cardio': [
+        'treadmill', 'running', 'jogging', 'jog', 'hiit', 'dance cardio',
+        'dance fitness', 'dance workout', 'dance', 'swimming', 'swim',
+        'hiking', 'hike', 'cycling', 'cycle', 'skipping', 'jump rope',
+        'stair', 'run', 'cardio', 'steps', 'walk',
+    ],
+    'Strength': [
+        'pull day', 'push day', 'leg day', 'upper body', 'lower body',
+        'deadlift', 'bench press', 'squat', 'weights', 'lifting', 'lift',
+        'shoulder', 'chest', 'pull', 'push', 'arms', 'back', 'legs',
+        'strength', 'gym',
+    ],
+    'Flexibility': [
+        'physiotherapy', 'physio', 'pilates', 'stretching', 'stretch',
+        'mobility', 'flexibility', 'yoga',
+    ],
+    'Sports': [
+        'table tennis', 'badminton', 'cricket', 'football', 'basketball',
+        'squash', 'tennis', 'sport', 'match',
+    ],
+}
+
+
+def categorize_activity(text: str) -> str:
+    """Return the best-matching category for a workout message, or 'General'."""
+    t = text.lower()
+    for cat, keywords in ACTIVITY_CATEGORIES.items():
+        for kw in keywords:
+            if kw in t:
+                return cat
+    return 'General'
+
 # ── Parsing ───────────────────────────────────────────────────────────────────
 
 MSG_RE = re.compile(
@@ -112,7 +150,7 @@ def parse_messages(filepaths):
 
 
 def extract_workout_entries(messages):
-    """Return {person: [(workout_date, workout_num), ...]} for 2026 onwards.
+    """Return {person: [(workout_date, workout_num, category), ...]} for 2026 onwards.
 
     Any author not in NAME_MAP who posts a #N tag is auto-included under their
     raw WhatsApp name (first word, title-cased) and a warning is printed so the
@@ -173,7 +211,13 @@ def extract_workout_entries(messages):
             # Day-name hints (e.g. "Tuesday", "Saturday")
             # Not worth the complexity — skip, use message date
 
-            entries[author].append((workout_date, num))
+            # Build combined text (before + after #N) for activity categorisation
+            before_text = text[:m.start()].strip()
+            after_text  = context  # already lower-cased strip of group(2)
+            full_activity = f'{before_text} {after_text}'.strip()
+            category = categorize_activity(full_activity)
+
+            entries[author].append((workout_date, num, category))
 
     return entries
 
@@ -226,9 +270,10 @@ def compute_timeseries(entries, backfill=False):
     if not entries:
         return []
 
-    # Max workout number per day
+    # Max workout number per day (entries may be 2- or 3-tuples)
     by_date = {}
-    for d, n in entries:
+    for item in entries:
+        d, n = item[0], item[1]
         by_date[d] = max(by_date.get(d, 0), n)
 
     first_date = min(by_date.keys())
@@ -276,14 +321,26 @@ def build_stats(entries):
         if not workout_list:
             continue
 
-        dates_set = set(d for d, _ in workout_list)
-        total = max(n for _, n in workout_list)
+        dates_set = set(item[0] for item in workout_list)
+        total = max(item[1] for item in workout_list)
+
+        # Activity category counts (only one entry per date to avoid over-counting)
+        category_counts: dict[str, int] = defaultdict(int)
+        seen_cat_dates: set = set()
+        for item in workout_list:
+            d, n, cat = item[0], item[1], item[2] if len(item) > 2 else 'General'
+            # Count each workout date once per category bucket
+            key = (d, cat)
+            if key not in seen_cat_dates:
+                seen_cat_dates.add(key)
+                category_counts[cat] += 1
 
         # Monthly unique workout days
         monthly = defaultdict(int)
         seen_by_month = defaultdict(set)
-        for d, _ in workout_list:
-            mk = d.strftime('%Y-%m')
+        for item in workout_list:
+            d = item[0]
+            mk = d.strftime('%Y-%m')  # type: ignore[attr-defined]
             all_months.add(mk)
             if d not in seen_by_month[mk]:
                 seen_by_month[mk].add(d)
@@ -320,6 +377,7 @@ def build_stats(entries):
             ),
             'workout_dates': sorted(d.isoformat() for d in dates_set),
             'achievements': compute_achievements(total, best_streak, dict(monthly)),
+            'activity_categories': dict(category_counts),
             'emoji': PERSON_CONFIG.get(person, {}).get('emoji', ''),
             'color': PERSON_CONFIG.get(person, {}).get('color', '#888'),
             'in_cards': person not in CARDS_EXCLUDE,
@@ -464,7 +522,7 @@ def main():
     print('Extracting workouts…')
     entries = extract_workout_entries(messages)
     for person, e in sorted(entries.items(), key=lambda x: -len(x[1])):
-        top = max(n for _, n in e)
+        top = max(item[1] for item in e)
         print(f'  {person}: {len(e)} entries, max #{top}')
 
     print('Computing stats…')
