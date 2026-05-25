@@ -327,6 +327,16 @@ def build_stats(entries):
         dates_set = set(item[0] for item in workout_list)
         total = max(item[1] for item in workout_list)
 
+        # Infer actual first workout date from the workout counter.
+        # If someone's first post was "#23" on Jan 23, they'd done 22 workouts
+        # before joining the chat → inferred start = Jan 23 − 22 days = Jan 1.
+        # Clamped to Jan 1 so we never go before the year.
+        wlist_sorted_by_date = sorted(workout_list, key=lambda x: (x[0], x[1]))
+        first_post_date = wlist_sorted_by_date[0][0]
+        first_post_num  = wlist_sorted_by_date[0][1]
+        first_workout_date = max(date(2026, 1, 1),
+                                 first_post_date - timedelta(days=(first_post_num - 1)))
+
         # Activity category counts (only one entry per date to avoid over-counting)
         category_counts: dict[str, int] = defaultdict(int)
         seen_cat_dates: set = set()
@@ -378,6 +388,7 @@ def build_stats(entries):
                 workout_list,
                 backfill=PERSON_CONFIG.get(person, {}).get('backfill', False),
             ),
+            'first_workout_date': first_workout_date.isoformat(),
             'workout_dates': sorted(d.isoformat() for d in dates_set),
             'achievements': compute_achievements(total, best_streak, dict(monthly)),
             'activity_categories': dict(category_counts),

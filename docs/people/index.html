@@ -605,9 +605,11 @@ async function init() {
   const timeline = qs('timeline');
   const milestones = [];
 
-  // First workout
-  if (stats.workout_dates.length > 0) {
-    milestones.push({ label: '🏁 First workout of 2026', date: stats.workout_dates[0], color: stats.color });
+  // First workout — use inferred date (back-calculated from first post number)
+  // so Arjit's #23 on Jan 23 correctly shows Jan 1, not Jan 23.
+  const firstDate = stats.first_workout_date || stats.workout_dates[0];
+  if (firstDate) {
+    milestones.push({ label: '🏁 First workout of 2026', date: firstDate, color: stats.color });
   }
 
   // Count milestones: find date when they first hit 25, 50, 75, 100, 125
