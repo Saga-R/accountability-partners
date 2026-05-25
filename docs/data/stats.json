@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-25T21:11:25",
+  "generated_at": "2026-05-25T21:21:27",
   "date_range": {
     "start": "2026-01-22",
     "end": "2026-05-24"
@@ -452,11 +452,11 @@
         "w75"
       ],
       "activity_categories": {
-        "Cardio": 11,
-        "General": 24,
-        "Strength": 13,
-        "Flexibility": 10,
-        "Sports": 2
+        "Cardio": 16,
+        "Sports": 1,
+        "General": 7,
+        "Strength": 17,
+        "Flexibility": 11
       },
       "emoji": "🏏",
       "color": "#6C63FF",
@@ -976,7 +976,9 @@
         "consistent_month"
       ],
       "activity_categories": {
-        "General": 95
+        "General": 38,
+        "Cardio": 11,
+        "Strength": 51
       },
       "emoji": "💪",
       "color": "#FF6B6B",
@@ -1328,9 +1330,9 @@
         "w75"
       ],
       "activity_categories": {
-        "General": 17,
+        "General": 16,
         "Strength": 42,
-        "Cardio": 4
+        "Cardio": 5
       },
       "emoji": "🏋️",
       "color": "#FF6584",
@@ -2003,8 +2005,8 @@
         "consistent_month"
       ],
       "activity_categories": {
-        "Cardio": 34,
-        "General": 19,
+        "Cardio": 39,
+        "General": 13,
         "Strength": 12,
         "Sports": 2,
         "Flexibility": 2
@@ -2232,10 +2234,10 @@
         "w50"
       ],
       "activity_categories": {
-        "General": 26,
-        "Sports": 6,
-        "Strength": 2,
-        "Cardio": 4
+        "General": 12,
+        "Strength": 9,
+        "Sports": 8,
+        "Cardio": 9
       },
       "emoji": "🏊",
       "color": "#4FC3F7",
@@ -2289,7 +2291,8 @@
       ],
       "achievements": [],
       "activity_categories": {
-        "General": 4
+        "Cardio": 2,
+        "General": 2
       },
       "emoji": "💃",
       "color": "#C084FC",
@@ -2630,8 +2633,7 @@
       ],
       "activity_categories": {
         "Strength": 3,
-        "General": 1,
-        "Sports": 1
+        "General": 1
       },
       "emoji": "🧘",
       "color": "#B8B8FF",

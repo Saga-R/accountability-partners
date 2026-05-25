@@ -64,7 +64,7 @@ ACTIVITY_CATEGORIES = {
         'treadmill', 'running', 'jogging', 'jog', 'hiit', 'dance cardio',
         'dance fitness', 'dance workout', 'dance', 'swimming', 'swim',
         'hiking', 'hike', 'cycling', 'cycle', 'skipping', 'jump rope',
-        'stair', 'run', 'cardio', 'steps', 'walk',
+        'stair', 'run', 'cardio', 'k steps', 'steps', 'walk', 'k+',
     ],
     'Strength': [
         'pull day', 'push day', 'leg day', 'upper body', 'lower body',
@@ -211,9 +211,12 @@ def extract_workout_entries(messages):
             # Day-name hints (e.g. "Tuesday", "Saturday")
             # Not worth the complexity — skip, use message date
 
-            # Build combined text (before + after #N) for activity categorisation
+            # Build combined text for activity categorisation.
+            # group(2) only captures same-line text after #N (stops at \n).
+            # text[m.end():] catches descriptions on the next line, which is
+            # how Arjit (and others) post:  "#123\nPull day" or "#121\n10k steps"
             before_text = text[:m.start()].strip()
-            after_text  = context  # already lower-cased strip of group(2)
+            after_text  = (m.group(2) + ' ' + text[m.end():]).strip()
             full_activity = f'{before_text} {after_text}'.strip()
             category = categorize_activity(full_activity)
 
