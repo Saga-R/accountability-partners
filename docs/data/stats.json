@@ -1,27 +1,28 @@
 {
-  "generated_at": "2026-05-25T22:33:00",
+  "generated_at": "2026-06-02T19:01:54",
   "date_range": {
     "start": "2026-01-01",
-    "end": "2026-05-24"
+    "end": "2026-06-02"
   },
   "people": {
     "Arjit": {
-      "total": 123,
+      "total": 132,
       "monthly": {
         "2026-01": 31,
         "2026-02": 18,
         "2026-03": 22,
         "2026-04": 25,
-        "2026-05": 21
+        "2026-05": 27,
+        "2026-06": 2
       },
-      "last30": 26,
+      "last30": 28,
       "last7": 7,
       "weekly": 7,
-      "this_month": 21,
+      "this_month": 2,
       "best_streak": 31,
-      "current_streak": 14,
-      "last_date": "2026-05-24",
-      "days_since": 1,
+      "current_streak": 4,
+      "last_date": "2026-06-02",
+      "days_since": 0,
       "timeseries": [
         {
           "date": "2026-01-01",
@@ -497,7 +498,35 @@
         },
         {
           "date": "2026-05-25",
-          "count": 123
+          "count": 124
+        },
+        {
+          "date": "2026-05-26",
+          "count": 125
+        },
+        {
+          "date": "2026-05-27",
+          "count": 126
+        },
+        {
+          "date": "2026-05-28",
+          "count": 127
+        },
+        {
+          "date": "2026-05-30",
+          "count": 129
+        },
+        {
+          "date": "2026-05-31",
+          "count": 130
+        },
+        {
+          "date": "2026-06-01",
+          "count": 131
+        },
+        {
+          "date": "2026-06-02",
+          "count": 132
         }
       ],
       "first_workout_date": "2026-01-01",
@@ -618,13 +647,22 @@
         "2026-05-21",
         "2026-05-22",
         "2026-05-23",
-        "2026-05-24"
+        "2026-05-24",
+        "2026-05-25",
+        "2026-05-26",
+        "2026-05-27",
+        "2026-05-28",
+        "2026-05-30",
+        "2026-05-31",
+        "2026-06-01",
+        "2026-06-02"
       ],
       "achievements": [
         "w25",
         "w50",
         "w75",
         "w100",
+        "w125",
         "s7",
         "s14",
         "s30",
@@ -632,30 +670,31 @@
       ],
       "activity_categories": {
         "General": 58,
-        "Strength": 53,
-        "Cardio": 11
+        "Strength": 60,
+        "Cardio": 12
       },
       "emoji": "💪",
       "color": "#FF6B6B",
       "in_cards": true
     },
     "Sharad": {
-      "total": 87,
+      "total": 91,
       "monthly": {
         "2026-01": 18,
         "2026-02": 15,
         "2026-03": 3,
         "2026-04": 13,
-        "2026-05": 17
+        "2026-05": 19,
+        "2026-06": 2
       },
-      "last30": 21,
-      "last7": 5,
-      "weekly": 5,
-      "this_month": 17,
+      "last30": 19,
+      "last7": 4,
+      "weekly": 4,
+      "this_month": 2,
       "best_streak": 9,
-      "current_streak": 0,
-      "last_date": "2026-05-23",
-      "days_since": 2,
+      "current_streak": 2,
+      "last_date": "2026-06-02",
+      "days_since": 0,
       "timeseries": [
         {
           "date": "2026-01-01",
@@ -926,8 +965,20 @@
           "count": 87
         },
         {
-          "date": "2026-05-25",
-          "count": 87
+          "date": "2026-05-29",
+          "count": 88
+        },
+        {
+          "date": "2026-05-30",
+          "count": 89
+        },
+        {
+          "date": "2026-06-01",
+          "count": 90
+        },
+        {
+          "date": "2026-06-02",
+          "count": 91
         }
       ],
       "first_workout_date": "2026-01-01",
@@ -997,7 +1048,11 @@
         "2026-05-19",
         "2026-05-20",
         "2026-05-21",
-        "2026-05-23"
+        "2026-05-23",
+        "2026-05-29",
+        "2026-05-30",
+        "2026-06-01",
+        "2026-06-02"
       ],
       "achievements": [
         "w25",
@@ -1006,9 +1061,10 @@
         "s7"
       ],
       "activity_categories": {
-        "General": 44,
-        "Cardio": 20,
-        "Sports": 2
+        "General": 45,
+        "Cardio": 21,
+        "Sports": 2,
+        "Strength": 2
       },
       "emoji": "⚡",
       "color": "#FFB347",
@@ -1027,7 +1083,7 @@
       "best_streak": 3,
       "current_streak": 0,
       "last_date": "2026-02-02",
-      "days_since": 112,
+      "days_since": 120,
       "timeseries": [
         {
           "date": "2026-01-01",
@@ -1090,7 +1146,7 @@
           "count": 14
         },
         {
-          "date": "2026-05-25",
+          "date": "2026-06-02",
           "count": 14
         }
       ],
@@ -1121,22 +1177,23 @@
       "in_cards": false
     },
     "Sagar": {
-      "total": 89,
+      "total": 97,
       "monthly": {
         "2026-01": 17,
         "2026-02": 7,
         "2026-03": 10,
         "2026-04": 15,
-        "2026-05": 13
+        "2026-05": 17,
+        "2026-06": 2
       },
-      "last30": 15,
+      "last30": 18,
       "last7": 6,
       "weekly": 6,
-      "this_month": 13,
+      "this_month": 2,
       "best_streak": 6,
-      "current_streak": 2,
-      "last_date": "2026-05-24",
-      "days_since": 1,
+      "current_streak": 3,
+      "last_date": "2026-06-02",
+      "days_since": 0,
       "timeseries": [
         {
           "date": "2026-01-01",
@@ -1375,8 +1432,28 @@
           "count": 89
         },
         {
-          "date": "2026-05-25",
-          "count": 89
+          "date": "2026-05-27",
+          "count": 91
+        },
+        {
+          "date": "2026-05-28",
+          "count": 92
+        },
+        {
+          "date": "2026-05-29",
+          "count": 93
+        },
+        {
+          "date": "2026-05-31",
+          "count": 95
+        },
+        {
+          "date": "2026-06-01",
+          "count": 96
+        },
+        {
+          "date": "2026-06-02",
+          "count": 97
         }
       ],
       "first_workout_date": "2026-01-01",
@@ -1442,7 +1519,13 @@
         "2026-05-20",
         "2026-05-21",
         "2026-05-23",
-        "2026-05-24"
+        "2026-05-24",
+        "2026-05-27",
+        "2026-05-28",
+        "2026-05-29",
+        "2026-05-31",
+        "2026-06-01",
+        "2026-06-02"
       ],
       "achievements": [
         "w25",
@@ -1450,33 +1533,34 @@
         "w75"
       ],
       "activity_categories": {
-        "Cardio": 24,
-        "General": 14,
-        "Strength": 18,
-        "Sports": 1,
-        "Flexibility": 11
+        "Cardio": 28,
+        "General": 15,
+        "Strength": 19,
+        "Sports": 2,
+        "Flexibility": 12
       },
       "emoji": "🏏",
       "color": "#6C63FF",
       "in_cards": true
     },
     "Harsh": {
-      "total": 51,
+      "total": 55,
       "monthly": {
         "2026-01": 12,
         "2026-02": 2,
         "2026-03": 10,
         "2026-04": 13,
-        "2026-05": 11
+        "2026-05": 13,
+        "2026-06": 1
       },
-      "last30": 13,
+      "last30": 12,
       "last7": 3,
       "weekly": 3,
-      "this_month": 11,
+      "this_month": 1,
       "best_streak": 4,
-      "current_streak": 0,
-      "last_date": "2026-05-23",
-      "days_since": 2,
+      "current_streak": 1,
+      "last_date": "2026-06-02",
+      "days_since": 0,
       "timeseries": [
         {
           "date": "2026-01-01",
@@ -1675,8 +1759,16 @@
           "count": 51
         },
         {
-          "date": "2026-05-25",
-          "count": 51
+          "date": "2026-05-28",
+          "count": 53
+        },
+        {
+          "date": "2026-05-30",
+          "count": 54
+        },
+        {
+          "date": "2026-06-02",
+          "count": 55
         }
       ],
       "first_workout_date": "2026-01-02",
@@ -1728,7 +1820,10 @@
         "2026-05-12",
         "2026-05-19",
         "2026-05-22",
-        "2026-05-23"
+        "2026-05-23",
+        "2026-05-28",
+        "2026-05-30",
+        "2026-06-02"
       ],
       "achievements": [
         "w25",
@@ -1736,7 +1831,7 @@
       ],
       "activity_categories": {
         "General": 19,
-        "Cardio": 11,
+        "Cardio": 14,
         "Strength": 11,
         "Sports": 8
       },
@@ -1745,22 +1840,23 @@
       "in_cards": true
     },
     "Rashmi": {
-      "total": 83,
+      "total": 88,
       "monthly": {
         "2026-01": 15,
         "2026-02": 9,
         "2026-03": 19,
         "2026-04": 22,
-        "2026-05": 13
+        "2026-05": 17,
+        "2026-06": 1
       },
-      "last30": 19,
-      "last7": 4,
-      "weekly": 4,
-      "this_month": 13,
+      "last30": 17,
+      "last7": 5,
+      "weekly": 5,
+      "this_month": 1,
       "best_streak": 11,
       "current_streak": 1,
-      "last_date": "2026-05-24",
-      "days_since": 1,
+      "last_date": "2026-06-02",
+      "days_since": 0,
       "timeseries": [
         {
           "date": "2026-01-02",
@@ -2071,8 +2167,24 @@
           "count": 83
         },
         {
-          "date": "2026-05-25",
-          "count": 83
+          "date": "2026-05-28",
+          "count": 84
+        },
+        {
+          "date": "2026-05-29",
+          "count": 85
+        },
+        {
+          "date": "2026-05-30",
+          "count": 86
+        },
+        {
+          "date": "2026-05-31",
+          "count": 87
+        },
+        {
+          "date": "2026-06-02",
+          "count": 88
         }
       ],
       "first_workout_date": "2026-01-03",
@@ -2154,7 +2266,12 @@
         "2026-05-19",
         "2026-05-21",
         "2026-05-22",
-        "2026-05-24"
+        "2026-05-24",
+        "2026-05-28",
+        "2026-05-29",
+        "2026-05-30",
+        "2026-05-31",
+        "2026-06-02"
       ],
       "achievements": [
         "w25",
@@ -2164,11 +2281,11 @@
         "consistent_month"
       ],
       "activity_categories": {
-        "Cardio": 48,
-        "Strength": 14,
-        "General": 15,
+        "Cardio": 49,
+        "Strength": 16,
+        "General": 16,
         "Sports": 2,
-        "Flexibility": 2
+        "Flexibility": 3
       },
       "emoji": "🏃",
       "color": "#43E97B",
@@ -2187,7 +2304,7 @@
       "best_streak": 6,
       "current_streak": 0,
       "last_date": "2026-02-24",
-      "days_since": 90,
+      "days_since": 98,
       "timeseries": [
         {
           "date": "2026-01-04",
@@ -2298,7 +2415,7 @@
           "count": 27
         },
         {
-          "date": "2026-05-25",
+          "date": "2026-06-02",
           "count": 27
         }
       ],
@@ -2343,22 +2460,22 @@
       "in_cards": false
     },
     "Sahil": {
-      "total": 80,
+      "total": 82,
       "monthly": {
         "2026-01": 17,
         "2026-02": 8,
         "2026-03": 12,
         "2026-04": 19,
-        "2026-05": 18
+        "2026-05": 19
       },
-      "last30": 21,
-      "last7": 5,
-      "weekly": 5,
-      "this_month": 18,
+      "last30": 18,
+      "last7": 1,
+      "weekly": 1,
+      "this_month": 0,
       "best_streak": 6,
-      "current_streak": 5,
-      "last_date": "2026-05-24",
-      "days_since": 1,
+      "current_streak": 0,
+      "last_date": "2026-05-27",
+      "days_since": 6,
       "timeseries": [
         {
           "date": "2026-01-05",
@@ -2657,8 +2774,12 @@
           "count": 80
         },
         {
-          "date": "2026-05-25",
-          "count": 80
+          "date": "2026-05-27",
+          "count": 82
+        },
+        {
+          "date": "2026-06-02",
+          "count": 82
         }
       ],
       "first_workout_date": "2026-01-06",
@@ -2736,7 +2857,8 @@
         "2026-05-21",
         "2026-05-22",
         "2026-05-23",
-        "2026-05-24"
+        "2026-05-24",
+        "2026-05-27"
       ],
       "achievements": [
         "w25",
@@ -2745,7 +2867,7 @@
       ],
       "activity_categories": {
         "General": 18,
-        "Strength": 50,
+        "Strength": 51,
         "Cardio": 6
       },
       "emoji": "🏋️",
@@ -2753,19 +2875,19 @@
       "in_cards": true
     },
     "Riya": {
-      "total": 60,
+      "total": 65,
       "monthly": {
         "2026-01": 7,
-        "2026-05": 5
+        "2026-05": 9
       },
-      "last30": 5,
-      "last7": 1,
-      "weekly": 1,
-      "this_month": 5,
-      "best_streak": 2,
-      "current_streak": 1,
-      "last_date": "2026-05-24",
-      "days_since": 1,
+      "last30": 9,
+      "last7": 4,
+      "weekly": 4,
+      "this_month": 0,
+      "best_streak": 4,
+      "current_streak": 0,
+      "last_date": "2026-05-31",
+      "days_since": 2,
       "timeseries": [
         {
           "date": "2026-01-01",
@@ -2820,8 +2942,24 @@
           "count": 60
         },
         {
-          "date": "2026-05-25",
-          "count": 60
+          "date": "2026-05-28",
+          "count": 62
+        },
+        {
+          "date": "2026-05-29",
+          "count": 63
+        },
+        {
+          "date": "2026-05-30",
+          "count": 64
+        },
+        {
+          "date": "2026-05-31",
+          "count": 65
+        },
+        {
+          "date": "2026-06-02",
+          "count": 65
         }
       ],
       "first_workout_date": "2026-01-07",
@@ -2837,16 +2975,21 @@
         "2026-05-13",
         "2026-05-15",
         "2026-05-17",
-        "2026-05-24"
+        "2026-05-24",
+        "2026-05-28",
+        "2026-05-29",
+        "2026-05-30",
+        "2026-05-31"
       ],
       "achievements": [
         "w25",
         "w50"
       ],
       "activity_categories": {
-        "General": 3,
-        "Strength": 8,
-        "Cardio": 2
+        "General": 4,
+        "Strength": 9,
+        "Cardio": 4,
+        "Flexibility": 1
       },
       "emoji": "🐯",
       "color": "#FA709A",
@@ -2860,14 +3003,14 @@
         "2026-04": 10,
         "2026-05": 13
       },
-      "last30": 15,
-      "last7": 4,
-      "weekly": 4,
-      "this_month": 13,
+      "last30": 12,
+      "last7": 0,
+      "weekly": 0,
+      "this_month": 0,
       "best_streak": 5,
       "current_streak": 0,
       "last_date": "2026-05-22",
-      "days_since": 3,
+      "days_since": 11,
       "timeseries": [
         {
           "date": "2026-02-02",
@@ -3070,7 +3213,7 @@
           "count": 49
         },
         {
-          "date": "2026-05-25",
+          "date": "2026-06-02",
           "count": 49
         }
       ],
@@ -3145,11 +3288,11 @@
       "last30": 4,
       "last7": 0,
       "weekly": 0,
-      "this_month": 4,
+      "this_month": 0,
       "best_streak": 2,
       "current_streak": 0,
       "last_date": "2026-05-13",
-      "days_since": 12,
+      "days_since": 20,
       "timeseries": [
         {
           "date": "2026-05-04",
@@ -3172,7 +3315,7 @@
           "count": 71
         },
         {
-          "date": "2026-05-25",
+          "date": "2026-06-02",
           "count": 71
         }
       ],
@@ -3199,18 +3342,23 @@
   "mia": [
     {
       "name": "Smriti",
-      "days_since": 112,
+      "days_since": 120,
       "last_date": "2026-02-02"
     },
     {
       "name": "Jindal",
-      "days_since": 90,
+      "days_since": 98,
       "last_date": "2026-02-24"
     },
     {
       "name": "Ekansh",
-      "days_since": 12,
+      "days_since": 20,
       "last_date": "2026-05-13"
+    },
+    {
+      "name": "Nikhar",
+      "days_since": 11,
+      "last_date": "2026-05-22"
     }
   ],
   "spotlight": {
@@ -3218,12 +3366,7 @@
       "name": "Arjit",
       "count": 7
     },
-    "milestones": [
-      {
-        "name": "Harsh",
-        "number": 50
-      }
-    ],
+    "milestones": [],
     "comebacks": []
   }
 }
