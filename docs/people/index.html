@@ -157,7 +157,7 @@
 
     <!-- Pace card -->
     <div class="card" id="pace-card">
-      <div class="card-title">📈 Year Pace</div>
+      <div class="card-title" id="pace-title">📈 Year Pace</div>
       <div id="pace-text" style="font-size:15px; margin-bottom:10px;"></div>
       <div class="pace-bar-bg"><div class="pace-bar-fill" id="pace-bar"></div></div>
       <div class="pace-meta"><span>Jan 1</span><span id="pace-today-label"></span><span>Dec 31</span></div>
@@ -409,22 +409,56 @@ async function init() {
 
   // ── pace card ────────────────────────────────────────────────────────────
   const startOfYear = new Date('2026-01-01T00:00:00');
-  const endOfYear   = new Date('2026-12-31T00:00:00');
   const today       = new Date(); today.setHours(0,0,0,0);
   const dayOfYear   = Math.floor((today - startOfYear) / 86400000) + 1;
   const daysInYear  = 365;
   const yearPct     = dayOfYear / daysInYear;
   const projectedYE = Math.round(stats.total / yearPct);
-  const onPaceFor   = Math.round(yearPct * (stats.total / yearPct)); // same as total, just clarifying
+  const goal        = stats.goal || null;
 
-  qs('pace-text').innerHTML =
-    `<strong>${stats.total}</strong> workouts through day ${dayOfYear} of 365 · ` +
-    `On pace for <strong>${projectedYE}</strong> by Dec 31`;
-  const paceBar = qs('pace-bar');
-  const maxTotal = Math.max(...Object.values(people).map(s => s.total));
-  paceBar.style.width = `${Math.min(100, (stats.total / Math.max(projectedYE, maxTotal)) * 100)}%`;
-  paceBar.style.background = stats.color;
-  qs('pace-today-label').textContent = `Today (day ${dayOfYear})`;
+  if (goal) {
+    qs('pace-title').textContent = `🎯 Goal Progress — ${goal} workouts in 2026`;
+    // Show goal-based progress
+    const needed        = goal - stats.total;         // remaining to hit goal
+    const daysLeft      = daysInYear - dayOfYear;
+    const paceNeeded    = needed > 0 ? Math.ceil(needed / daysLeft * 7) : 0; // workouts/week needed
+    const onTrackTarget = Math.round(yearPct * goal); // where they should be today
+    const delta         = stats.total - onTrackTarget;
+    const deltaStr      = delta >= 0
+      ? `<span style="color:#22c55e">+${delta} ahead of pace 🟢</span>`
+      : `<span style="color:#f87171">${delta} behind pace 🔴</span>`;
+
+    qs('pace-text').innerHTML =
+      `<strong>${stats.total}</strong> of <strong>${goal}</strong> · ` +
+      `${needed > 0 ? `${needed} to go` : '🎉 Goal reached!'} · ${deltaStr}<br>` +
+      `<span style="font-size:13px;color:var(--muted)">On pace for <strong>${projectedYE}</strong> by Dec 31 · ` +
+      `${needed > 0 ? `Need ~${paceNeeded}/week to finish on time` : 'Keep it up!'}</span>`;
+
+    const paceBar = qs('pace-bar');
+    paceBar.style.width  = `${Math.min(100, (stats.total / goal) * 100)}%`;
+    paceBar.style.background = stats.color;
+
+    // Draw a "where you should be" marker
+    const barBg = paceBar.parentElement;
+    const marker = document.createElement('div');
+    marker.style.cssText = `position:absolute;top:-4px;bottom:-4px;width:2px;background:#ffffff44;border-radius:2px;left:${Math.min(100,yearPct*100)}%`;
+    barBg.style.position = 'relative';
+    barBg.appendChild(marker);
+
+    qs('pace-today-label').textContent = `Goal: ${goal}`;
+    qs('pace-meta').children[0].textContent = '0';
+    qs('pace-meta').children[2].textContent = `${goal}`;
+  } else {
+    // No goal set — show pure projection
+    qs('pace-text').innerHTML =
+      `<strong>${stats.total}</strong> workouts through day ${dayOfYear} of 365 · ` +
+      `On pace for <strong>${projectedYE}</strong> by Dec 31`;
+    const paceBar = qs('pace-bar');
+    const maxTotal = Math.max(...Object.values(people).map(s => s.total));
+    paceBar.style.width = `${Math.min(100, (stats.total / Math.max(projectedYE, maxTotal)) * 100)}%`;
+    paceBar.style.background = stats.color;
+    qs('pace-today-label').textContent = `Today (day ${dayOfYear})`;
+  }
 
   // ── achievements ─────────────────────────────────────────────────────────
   const badgesWrap = qs('badges-wrap');

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-02T19:01:54",
+  "generated_at": "2026-06-02T19:04:25",
   "date_range": {
     "start": "2026-01-01",
     "end": "2026-06-02"
@@ -675,6 +675,7 @@
       },
       "emoji": "💪",
       "color": "#FF6B6B",
+      "goal": null,
       "in_cards": true
     },
     "Sharad": {
@@ -1068,6 +1069,7 @@
       },
       "emoji": "⚡",
       "color": "#FFB347",
+      "goal": 200,
       "in_cards": true
     },
     "Smriti": {
@@ -1174,6 +1176,7 @@
       },
       "emoji": "💃",
       "color": "#C084FC",
+      "goal": 180,
       "in_cards": false
     },
     "Sagar": {
@@ -1541,6 +1544,7 @@
       },
       "emoji": "🏏",
       "color": "#6C63FF",
+      "goal": 250,
       "in_cards": true
     },
     "Harsh": {
@@ -1837,6 +1841,7 @@
       },
       "emoji": "🏊",
       "color": "#4FC3F7",
+      "goal": 200,
       "in_cards": true
     },
     "Rashmi": {
@@ -2289,6 +2294,7 @@
       },
       "emoji": "🏃",
       "color": "#43E97B",
+      "goal": 200,
       "in_cards": true
     },
     "Jindal": {
@@ -2457,6 +2463,7 @@
       },
       "emoji": "🦁",
       "color": "#FFA07A",
+      "goal": 180,
       "in_cards": false
     },
     "Sahil": {
@@ -2872,6 +2879,7 @@
       },
       "emoji": "🏋️",
       "color": "#FF6584",
+      "goal": null,
       "in_cards": true
     },
     "Riya": {
@@ -2993,6 +3001,7 @@
       },
       "emoji": "🐯",
       "color": "#FA709A",
+      "goal": 200,
       "in_cards": true
     },
     "Nikhar": {
@@ -3278,6 +3287,7 @@
       },
       "emoji": "🎯",
       "color": "#A8E063",
+      "goal": 150,
       "in_cards": true
     },
     "Ekansh": {
@@ -3336,6 +3346,7 @@
       },
       "emoji": "🧘",
       "color": "#B8B8FF",
+      "goal": 200,
       "in_cards": false
     }
   },

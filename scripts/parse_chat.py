@@ -38,17 +38,17 @@ NAME_MAP = {
 }
 
 PERSON_CONFIG = {
-    'Arjit':  {'emoji': '💪', 'color': '#FF6B6B'},
-    'Sagar':  {'emoji': '🏏', 'color': '#6C63FF'},
-    'Rashmi': {'emoji': '🏃', 'color': '#43E97B'},
-    'Sharad': {'emoji': '⚡', 'color': '#FFB347'},
-    'Sahil':  {'emoji': '🏋️', 'color': '#FF6584'},
-    'Harsh':  {'emoji': '🏊', 'color': '#4FC3F7'},
-    'Nikhar': {'emoji': '🎯', 'color': '#A8E063'},
-    'Riya':   {'emoji': '🐯', 'color': '#FA709A', 'backfill': True},
-    'Smriti': {'emoji': '💃', 'color': '#C084FC'},
-    'Ekansh': {'emoji': '🧘', 'color': '#B8B8FF'},
-    'Jindal': {'emoji': '🦁', 'color': '#FFA07A'},
+    'Arjit':  {'emoji': '💪', 'color': '#FF6B6B'},                        # no numeric goal stated
+    'Sagar':  {'emoji': '🏏', 'color': '#6C63FF', 'goal': 250},
+    'Rashmi': {'emoji': '🏃', 'color': '#43E97B', 'goal': 200},
+    'Sharad': {'emoji': '⚡', 'color': '#FFB347', 'goal': 200},
+    'Sahil':  {'emoji': '🏋️', 'color': '#FF6584'},                        # no goal stated
+    'Harsh':  {'emoji': '🏊', 'color': '#4FC3F7', 'goal': 200},
+    'Nikhar': {'emoji': '🎯', 'color': '#A8E063', 'goal': 150},
+    'Riya':   {'emoji': '🐯', 'color': '#FA709A', 'backfill': True, 'goal': 200},
+    'Smriti': {'emoji': '💃', 'color': '#C084FC', 'goal': 180},
+    'Ekansh': {'emoji': '🧘', 'color': '#B8B8FF', 'goal': 200},           # 50/quarter × 4
+    'Jindal': {'emoji': '🦁', 'color': '#FFA07A', 'goal': 180},           # 45/quarter × 4
 }
 
 # Shown only in leaderboard, not individual stat cards
@@ -394,6 +394,7 @@ def build_stats(entries):
             'activity_categories': dict(category_counts),
             'emoji': PERSON_CONFIG.get(person, {}).get('emoji', ''),
             'color': PERSON_CONFIG.get(person, {}).get('color', '#888'),
+            'goal': PERSON_CONFIG.get(person, {}).get('goal', None),
             'in_cards': person not in CARDS_EXCLUDE,
         }
 
